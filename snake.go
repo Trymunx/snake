@@ -12,11 +12,11 @@ type point struct {
 	y int
 }
 
-func randomPoint(w, h int) *point {
+func randomFoodLocation(w, h int) *point {
 	return &point{
 		// Make sure x coords are always a multiple of 2
 		x: 1 + 2*rand.Intn((w-2)/2),
-		y: 1 + rand.Intn(h-2),
+		y: 3 + rand.Intn(h-4),
 	}
 }
 
@@ -36,9 +36,10 @@ type gameData struct {
 }
 
 func newSnake(x, y int) *snake {
+	const snakeLength = 5
 	head := &point{x: x, y: y}
 	tail := []*point{}
-	for i := 1; i < 6; i++ {
+	for i := 1; i <= snakeLength; i++ {
 		tail = append(tail, &point{x: x - (2 * i), y: y})
 	}
 	return &snake{head, tail}
@@ -51,7 +52,7 @@ func newGameData(s tcell.Screen) *gameData {
 		// The x-coord is gross to make it line up on 2n+1 grid lines that food generates on.
 		snake:    newSnake(w/2+(w/2)%2-1, h/2),
 		dir:      &point{x: 2, y: 0},
-		food:     randomPoint(w, h),
+		food:     randomFoodLocation(w, h),
 		gameOver: false,
 		screen:   s,
 		gameloop: gl,
@@ -80,12 +81,12 @@ func (gd *gameData) setUpdateFunc() {
 		}
 		if gd.snake.head.x == gd.food.x && gd.snake.head.y == gd.food.y {
 			gd.snake.tail = append(gd.snake.tail, last)
-			gd.food = randomPoint(gd.screen.Size())
+			gd.food = randomFoodLocation(gd.screen.Size())
 		}
 		gd.snake.head.x += gd.dir.x
 		gd.snake.head.y += gd.dir.y
 		w, h := gd.screen.Size()
-		if gd.snake.head.x < 1 || gd.snake.head.x >= w-1 || gd.snake.head.y < 1 || gd.snake.head.y >= h-1 {
+		if gd.snake.head.x < 1 || gd.snake.head.x >= w-1 || gd.snake.head.y < 2 || gd.snake.head.y >= h-1 {
 			gd.gameOver = true
 			gd.draw(gd.screen)
 			gd.gameloop.Stop()

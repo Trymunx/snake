@@ -57,12 +57,12 @@ func main() {
 				}
 			}
 			if ev.Rune() == 'p' || ev.Rune() == 'P' {
-				gd.paused = !gd.paused
+				gd.paused = !gd.gameOver && !gd.paused
 			}
 			if (ev.Rune() == 'r' || ev.Rune() == 'R') && gd.gameOver {
 				w, h := s.Size()
 				gd.snake = newSnake(w/2, h/2)
-				gd.food = randomPoint(w, h)
+				gd.food = randomFoodLocation(w, h)
 				gd.dir = &point{x: 2, y: 0}
 				gd = newGameData(s)
 				gd.start()
